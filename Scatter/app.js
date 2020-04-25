@@ -19,6 +19,7 @@ var svg = d3.select('#chart')
 			.attr('width', chart_width)
 			.attr('height', chart_height);
 
+
 // Create scales
 
 var x_scale = d3.scaleLinear()
@@ -40,30 +41,6 @@ var r_scale = d3.scaleLinear()
 				})])
 				.range([5,30]);
 
-
-// Create Axis
-var x_axis = d3.axisBottom(x_scale);
-				//.ticks(5);
-				//.tickValues([0,150,250,600,700]);
-svg.append('g')
-	.attr('class', 'x_axis' )
-	.attr('transform', 'translate(0,'+ (chart_height - padding)+')')
-	.call(x_axis);
-
-var y_axis = d3.axisLeft(y_scale)
-				.ticks(5);
-				//.tickFormat(function(d){
-				//	return d + '%';
-				//});
-svg.append('g')
-	.attr('class', 'y_axis' )
-	.attr(
-		'transform', 
-		'translate(' + padding + ',0)'
-	)
-	.call(y_axis);
-
-
 // Create circles
 svg.selectAll('circle')
 	.data(data)
@@ -80,9 +57,8 @@ svg.selectAll('circle')
 	})
 	.attr('fill', '#d1ab0e');
 
-
 // Create labels
-svg.append('g').selectAll('text')
+svg.selectAll('text')
 	.data(data)
 	.enter()
 	.append('text')
