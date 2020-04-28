@@ -55,3 +55,45 @@ svg.selectAll( 'text' )
     .attr( 'font-size', 14 )
     .attr( 'fill', '#fff' )
     .attr( 'text-anchor', 'middle' );
+
+// Events
+d3.select('button').on('click', function(){
+    //data.reverse();
+    data[0]= 50;
+    y_scale.domain([0, d3.max(data)]); // When the data changes we need to update the domain.
+
+    svg.selectAll('rect')
+    .data(data)
+    .transition() // Bars Animation
+    .delay(function(d, i){ 
+        return i /data.length * 1000; 
+    })
+    .duration(1000)
+    .ease(d3.easeElasticOut)
+    //.attr('opacity', Math.random())
+        .attr( 'y', function(d ){
+        return chart_height - y_scale(d);
+    })
+    .attr( 'height', function(d){
+        return y_scale(d);
+    });
+    //Label text Update
+    svg.selectAll( 'text' )
+    .data(data)
+    .transition() // The order is important - The animation should be after loading the data.
+    .delay(function(d, i){ 
+        return i /data.length * 1000; 
+    })
+    .duration(1000)
+    .ease(d3.easeElasticOut)
+    .text(function( d ){
+        return d;
+    })
+    .attr( 'x', function( d, i ){
+        return x_scale(i) +
+                   x_scale.bandwidth()/2;
+    })
+    .attr( 'y', function(d ){
+        return chart_height - y_scale(d) +15 ;
+    });
+});

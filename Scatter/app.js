@@ -3,14 +3,14 @@ var data            =   [
     [ 210,140 ],
     [ 722,300 ],
     [ 70,160 ],
-    [ 250,50 ],
+    [ 250,5000 ],
     [ 110,280 ],
     [ 699,225 ],
     [ 90, 220 ]
 ];
 var chart_width     =   800;
 var chart_height    =   400;
-var padding = 50;
+var padding 		= 50;
 
 
 // Create SVG Element
@@ -33,12 +33,22 @@ var y_scale = d3.scaleLinear()
 				})])
 				.range([chart_height - padding, padding]);
 
+// Clip Paths
+svg.append('clipPath')
+	.attr('id', 'plot-area-clip-path')
+	.append('rect')
+	.attr('x', padding)
+	.attr('y', padding)
+	.attr('width', chart_width - padding * 3)
+	.attr('height', chart_height - padding * 2);
 
-var r_scale = d3.scaleLinear()
-				.domain([0, d3.max(data, function(d){
-					return d[1];
-				})])
-				.range([5,30]);
+
+
+//var r_scale = d3.scaleLinear()
+//				.domain([0, d3.max(data, function(d){
+//					return d[1];
+//				})])
+//				.range([5,30]);
 
 
 // Create Axis
@@ -65,7 +75,10 @@ svg.append('g')
 
 
 // Create circles
-svg.selectAll('circle')
+svg.append('g')
+	.attr('id', 'plot-area')
+	.attr('clip-path', 'url(#plot-area-clip-path)')
+	.selectAll('circle')
 	.data(data)
 	.enter()
 	.append('circle')
@@ -75,23 +88,81 @@ svg.selectAll('circle')
 	.attr('cy', function(d){
 		return y_scale(d[1]);
 	})
-	.attr('r', function(d){
-		return d[1]/10;
-	})
+	.attr('r', 15) 
+	//.attr('r', function(d){
+	//	return d[1]/10;
+	//})
 	.attr('fill', '#d1ab0e');
 
 
-// Create labels
-svg.append('g').selectAll('text')
-	.data(data)
-	.enter()
-	.append('text')
-	.text(function(d){
-		return d.join(',');
-	})
-	.attr('x', function(d){
-		return x_scale(d[0]);
-	})
-	.attr('y', function(d){
-		return y_scale(d[1]);
-	});
+// Create labels 
+//svg.append('g').selectAll('text')
+//	.data(data)
+//	.enter()
+//	.append('text')
+//	.text(function(d){
+//		return d.join(',');
+//	})
+//	.attr('x', function(d){
+//		return x_scale(d[0]);
+//	})
+//	.attr('y', function(d){
+//		return y_scale(d[1]);
+//	});
+
+
+
+
+// Events
+d3.select('button').on('click', function(){
+	//Create randonm data
+	data = [];
+	var max_num = Math.random() * 1000;
+	for (var i = 0; i < 8; i++){
+		var new_x = Math.floor(Math.random() * max_num);
+		var new_y = Math.floor(Math.random() * max_num);
+		data.push([new_x, new_y]);
+	}
+
+	//// Update scale
+	x_scale.domain([0, d3.max(data, function(d){
+		return d[0];
+	})]);
+	
+	y_scale.domain([0, d3.max(data, function(d){
+		return d[1];
+	})]);
+
+	
+	// Update the chart
+	svg.selectAll('circle')
+		.data(data)
+		.transition()
+		.duration(1000)
+		.on('start', function(){
+			d3.select(this)
+				.attr('fill', '#F26D2D');
+		})
+		.attr('cx', function(d){
+			return x_scale(d[0]);
+		})
+		.attr('cy', function(d){
+			return y_scale(d[1]);
+		})
+		.on('end', function(){
+			d3.select(this)
+				.attr('fill', '#D1AB0E');
+		});
+
+	//Update Axis
+	svg.select(".x_axis")
+		.transition()
+		.duration(1000)
+		.call(x_axis);
+
+	svg.select(".y_axis")
+		.transition()
+		.duration(1000)
+		.call(y_axis);
+
+});
